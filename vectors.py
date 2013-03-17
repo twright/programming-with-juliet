@@ -1,3 +1,5 @@
+from numbers import Number
+
 class Vector(object):
 	"""docstring for Vector"""
 	def __init__(self, *xs):
@@ -67,17 +69,20 @@ class Vector(object):
 
 
 	def __mul__(self, other):
-		'''
+		''' If other is a vector gives the dot/scalar product of two
+		vectors. If other is a scalar gives normals multiplication of
+		a vector by a scalar.
 		>>> Vector(2, 3) * (1+4j)
 		Vector((2+8j), (3+12j))
 		>>> Vector(1, 2) * Vector(3, 4)
 		(11+0j)
-		'''
-		pass
-
-	def __rmul__(self):
-		'''
 		>>> 2 * Vector(1, 2)
 		Vector((2+0j), (4+0j))
 		'''
-		pass
+		if isinstance(other, Number):
+			return Vector(*[other*x for x in self])
+		if isinstance(other, Vector):
+			return sum(x*y for (x, y) in zip(self, other))
+		return NotImplemented
+
+	__rmul__ = __mul__

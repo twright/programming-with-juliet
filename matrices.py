@@ -54,33 +54,82 @@ class Matrix(object):
 
 	def __neg__(self):
 		''' Negate a matrix.
-		>>> - Matrix([[1, 2], [-3, 4]])
-		Matrix([[(-1+0j), (-2+0j)], [(3+0j), (-4+0j)]])
+		>>> -Matrix([[1, 2], [-3, 4]])
+		Matrix([[(-1+0j), (-2+0j)], [(3-0j), (-4+0j)]])
 		'''
-		pass
+		return self*(-1)
 
 	def __add__(self, other):
 		''' Add two Matrices.
 		>>> Matrix([[1, 2], [3, 4]]) + Matrix([[5, 6], [7, 8]])
 		Matrix([[(6+0j), (8+0j)], [(10+0j), (12+0j)]])
 		>>> Matrix([[1, 2]]) + Matrix([[3], [4]])
-		Traceback (most recent call first):
+		Traceback (most recent call last):
 		...
 		ValueError: These matrices are not of the same order!
 		>>> Matrix([[1, 2]]) + 'Juliet is beautiful'
-		Traceback (most recent call first):
+		Traceback (most recent call last):
 		...
-		TypeError: unsupported operand type(s) for -: 'Matrix' and 'str'
+		TypeError: unsupported operand type(s) for +: 'Matrix' and 'str'
 		'''
-		pass
+		if isinstance(other, Matrix):
+			if self.order() != other.order():
+				raise ValueError('These matrices are not of the same order!')
+			return Matrix([list(xs + ys) for (xs, ys) in zip(self, other)])
+		return NotImplemented
 	__radd__ = __add__
 
 	def __sub__(self, other):
 		''' Subtract one matrix from another.
 		>>> Matrix([[1, 2], [3, 4]]) - Matrix([[1, 1], [1, 1]])
-		Matrix([[(0+0j), (1+0j)], [(2+0j), (3+0j)]])
+		Matrix([[0j, (1+0j)], [(2+0j), (3+0j)]])
+		>>> Matrix([[1, 2]]) - Matrix([[1], [2]])
+		Traceback (most recent call last):
+		...
+		ValueError: These matrices are not of the same order!
+		>>> Matrix([[1, 2]]) - 'Juliet is beautiful'
+		Traceback (most recent call last):
+		...
+		TypeError: unsupported operand type(s) for -: 'Matrix' and 'str'
 		'''
-		pass
+		if isinstance(other, Matrix):
+			return self + (-other)
+		return NotImplemented
+
+	def __mul__(self, other):
+		''' Multiply two matrices.
+		>>> Matrix([[1, 2], [3, 4]]) * Matrix([[5, 6], [7, 8]])
+		Matrix([[(19+0j), (22+0j)], [(43+0j), (50+0j)]])
+		>>> Matrix([[1, 2]]) * Matrix([[3], [4]])
+		Matrix([[(11+0j)]])
+		>>> Matrix([[1, 2], [3, 4]])*(3+2j)
+		Matrix([[(3+2j), (6+4j)], [(9+6j), (12+8j)]])
+		>>> Matrix([[1, 2], [3, 4]])*Matrix([[1, 2, 3]])
+		Traceback (most recent call last):
+		...
+		ValueError: Matrices not commensurable.
+		>>> Matrix([[1, 2], [3, 4]])*Vector(1, 2)
+		Matrix([[(5+0j)], [(11+0j)]])
+		'''
+		if isinstance(other, Number):
+			return Matrix([list(other*xs) for xs in self])
+		if isinstance(other, Vector):
+			return self*Matrix([list(other)]).transpose()
+		if isinstance(other, Matrix):
+			if self.order('m') != other.order('n'):
+				raise ValueError('Matrices not commensurable.')
+			yss = other.transpose()
+			return Matrix([[xs*ys for ys in yss] for xs in self])
+		return NotImplemented
+
+	def __rmul__(self, other):
+		'''
+		>>> (3+2j) * Matrix([[1, 2], [3, 4]])
+		Matrix([[(3+2j), (6+4j)], [(9+6j), (12+8j)]])
+		'''
+		if isinstance(other, Number):
+			return self.__mul__(other)
+		return NotImplemented
 
 	def transpose(self):
 		''' Swap the rows of the matrix with columns and vis versa.
@@ -131,7 +180,7 @@ class Matrix(object):
 		>>> Matrix([[0, 2], [-2, 0]]).is_antisymmetric()
 		True
 		'''
-		pass
+		return self == -self.transpose()
 
 	def is_invertible(self):
 		''' Is this an invertible matrix?
@@ -140,7 +189,7 @@ class Matrix(object):
 		>>> Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).is_invertible()
 		False
 		'''
-		pass
+		return self.is_square() and self.det() != 0
 
 	def __getitem__(self, i):
 		''' Get the ith row of the matrix as a vector.
