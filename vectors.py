@@ -3,21 +3,21 @@ from numbers import Number
 class Vector(object):
 	"""docstring for Vector"""
 	def __init__(self, *xs):
-		self.xs = list(map(complex, xs))
+		self.__xs = list(map(complex, xs))
 
 	def __repr__(self):
 		'''
 		>>> Vector(1, 2, 3)
 		Vector((1+0j), (2+0j), (3+0j))
 		'''
-		return 'Vector({})'.format(', '.join(map(repr, self.xs)))
+		return 'Vector({})'.format(', '.join(map(repr, self.__xs)))
 
 	def __len__(self):
 		''' Returns the length of the Vector.
 		>>> len(Vector(1, 2, 3))
 		3
 		'''
-		return len(self.xs)
+		return len(self.__xs)
 
 	def __eq__(self, other):
 		''' Are two vectors equal?
@@ -40,10 +40,10 @@ class Vector(object):
 		>>> Vector(1, 2, 3)[2]
 		(2+0j)
 		'''
-		return self.xs[i-1]
+		return self.__xs[i-1]
 
 	def __iter__(self):
-		for x in self.xs:
+		for x in self.__xs:
 			yield x
 
 	def __add__(self, other):

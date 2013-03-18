@@ -27,14 +27,14 @@ class Matrix(object):
 			or not all(all(isinstance(x, Number) for x in xs)
 				for xs in xss)):
 			raise ValueError('This is not a matrix of numbers!')
-		self.xss = [[complex(x) for x in xs] for xs in xss]
+		self.__xss = [[complex(x) for x in xs] for xs in xss]
 
 	def __repr__(self):
 		''' Returns the representation of the object
 		>>> Matrix([[1, 2], [3, 4]])
 		Matrix([[(1+0j), (2+0j)], [(3+0j), (4+0j)]])
 		'''
-		return 'Matrix({})'.format(repr(self.xss))
+		return 'Matrix({})'.format(repr(self.__xss))
 
 	def __eq__(self, other):
 		''' Are two matrices equal?
@@ -147,7 +147,7 @@ class Matrix(object):
 		>>> Matrix([[1, 2, 3], [4, 5, 6]]).order()
 		(2, 3)
 		'''
-		(n, m) = (len(self.xss), len(self[1]))
+		(n, m) = (len(self.__xss), len(self[1]))
 		if component == 'n':
 			return n
 		if component == 'm':
@@ -198,10 +198,10 @@ class Matrix(object):
 		>>> Matrix([[1, 2], [3, 4]])[2][1]
 		(3+0j)
 		'''
-		return Vector(*self.xss[i - 1])
+		return Vector(*self.__xss[i - 1])
 
 	def __iter__(self):
-		for xs in self.xss:
+		for xs in self.__xss:
 			yield Vector(*xs)
 
 	def minor(self, i, j):
@@ -238,6 +238,6 @@ class Matrix(object):
 	def charactoristic_polynomial(self, variable):
 		''' Get the charactoristic polynomial of the Matrix.
 		>>> Matrix([[1, 2], [3, 4]]).charactoristic_polynomial(Variable('x'))
-		Polynomial('x', (-2+0j), (-5+0j), (1+0j))
+		Polynomial(Variable('x'), (-2+0j), (-5+0j), (1+0j))
 		'''
 		pass
